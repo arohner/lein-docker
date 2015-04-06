@@ -21,7 +21,8 @@ In your project.clj, add a key:
 
 Builds a docker image, using the dockerfile at the root of the project
 dir. Uses the repo name from the project.clj, and tags the image with
-the project.clj version.
+the project.clj version. If the version contains SNAPSHOT, it will be
+replaced with the current datetime.
 
 ### push
 
