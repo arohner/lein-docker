@@ -76,8 +76,7 @@
          arg-vers (first args)
          _ (println "arg-vers=" arg-vers)
          version (cond
-                   (nil? arg-vers) (get-version project)
-                   (= ":latest" arg-vers) (latest-version repo)
+                   (or (nil? arg-vers) (= ":latest" arg-vers)) (latest-version repo)
                    :else arg-vers)]
      (push* repo version))))
 
