@@ -74,7 +74,6 @@
   ([project args]
    (let [repo (-> project :docker :repo)
          arg-vers (first args)
-         _ (println "arg-vers=" arg-vers)
          version (cond
                    (or (nil? arg-vers) (= ":latest" arg-vers)) (latest-version repo)
                    :else arg-vers)]
