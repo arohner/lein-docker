@@ -1,10 +1,10 @@
 # lein-docker
 
+[![Clojars Project](http://clojars.org/arohner/lein-docker/latest-version.svg)](http://clojars.org/arohner/lein-docker)
+
 A Leiningen plugin to perform simple docker tasks. Mainly intended for use in continuous-deployment pipelines.
 
 ## Usage
-
-Put `[lein-docker "0.1.0-SNAPSHOT"]` into the `:plugins` vector of your project.clj.
 
 In your project.clj, add a key:
 
@@ -26,7 +26,7 @@ replaced with the current datetime.
 
 ### push
 
-    $ lein docker push <version>
+    $ lein docker push [<version>]
 
 Performs a simple docker push. Can optionally pass an explicit
 version, or `:latest`, which will push the most recent tag from this
