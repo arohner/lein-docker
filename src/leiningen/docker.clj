@@ -1,5 +1,6 @@
 (ns leiningen.docker
   (:require [clojure.string :as str]
+            [clojure.core.strint :refer (<<)]
             [me.raynes.conch :as sh]
             [me.raynes.conch.low-level :as shll])
   (:import java.text.SimpleDateFormat
@@ -79,9 +80,53 @@
                    :else arg-vers)]
      (push* repo version))))
 
+(defn sh-trampoline
+  "Abuse trampoline functionality to run arbitrary shell, rather than project-specific code."
+  [sh]
+  (println "running:" sh)
+  (spit (System/getenv "TRAMPOLINE_FILE") sh))
+
+(defn maybe-sudo [project]
+  (when (-> project :docker :sudo)
+    "sudo"))
+
+(defn maybe-m2-map [project]
+  (when-let [m2 (-> project :docker :m2-dest)]
+    (<< "-v ~/.m2/:~{m2}")))
+
+(defn port-map [project]
+  (when-let [ports (-> project :docker :ports)]
+    (->>
+     (for [[src dest] ports]
+       (<< "-p ~{src}:~{dest}"))
+     (str/join " "))))
+
+(defn lein
+  "Performs a `docker run` on image, mounting this project's source directory inside the container, and then runs leiningen inside the container with the supplied args. lein must already be installed on the container.
+
+Optional Project config: In your project.clj or ~/.lein/profiles.clj, add the following to your :docker map
+- :sudo true if docker requires sudo to `docker run`
+- :ports {} a map, passed to -p for port mapping
+- :m2-dest \"/home/username/.m2/\", will -v mount ~/.m2/ to :m2-dest, dramatically speeds up lein deps
+
+  "
+  ([project]
+   (println "Usage: lein docker lein <imgId or tag> <lein args>"))
+  ([project args]
+   (let [img (first args)
+         lein-args (rest args)
+         src-dir (:root project)
+         dest-dir (str "/src/" (:name project))
+         lein-cmd (str "lein " (str/join " " lein-args))]
+     (sh-trampoline (str/join " " [(maybe-sudo project) "docker" "run" "-it" (port-map project) "-v" (str src-dir ":" dest-dir) (maybe-m2-map project) img (format "sh -c '%s'" (<< "cd ~{dest-dir}; ~{lein-cmd}"))])))))
+
 (defn docker
+  "Run docker commands"
+  {:help-arglists '([build push lein])
+   :subtasks [#'build #'push #'lein]}
   [project & args]
   (let [cmd (first args)]
     (condp = cmd
       "build" (build project (rest args))
-      "push" (push project (rest args)))))
+      "push" (push project (rest args))
+      "lein" (lein project (rest args)))))
