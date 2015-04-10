@@ -40,9 +40,9 @@ repo.
 Performs a `docker run` on image, mounting this project's directory inside the container, then running leiningen inside the container with the supplied args. lein must already be installed on the container.
 
 Optional Project config: In your project.clj or ~/.lein/profiles.clj, add the following to your :docker map
-- :sudo true if docker requires sudo to `docker run`
-- :ports {} a map, passed to -p for port mapping
-- :m2-dest \"/home/username/.m2/\", will -v mount ~/.m2/ to :m2-dest, dramatically speeds up lein deps
+- `:sudo true` if docker requires sudo to `docker run`
+- `:ports {}` a map, passed to -p for port mapping
+- `:m2-dest \"/home/username/.m2/\"`, will -v mount ~/.m2/ to :m2-dest, dramatically speeds up lein deps
   
 ## License
 
