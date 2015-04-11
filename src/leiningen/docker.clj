@@ -101,6 +101,25 @@
        (<< "-p ~{src}:~{dest}"))
      (str/join " "))))
 
+(defn env-vars [project]
+  (when-let [envs (-> project :docker :env)]
+    (->>
+     (for [e envs
+           :let [e (name e)
+                 val (System/getenv e)]
+           :when val]
+       (<< "-e ~{e}='~{val}'"))
+     (str/join " "))))
+
+(defn links [project]
+  (when-let [links (-> project :docker :links)]
+    (->>
+     (for [[src dest] links
+           :let [src (name src)
+                 dest (name dest)]]
+       (<< "--link ~{src}:~{dest}"))
+     (str/join " "))))
+
 (defn lein
   "Performs a `docker run` on image, mounting this project's source directory inside the container, and then runs leiningen inside the container with the supplied args. lein must already be installed on the container.
 
@@ -118,7 +137,7 @@ Optional Project config: In your project.clj or ~/.lein/profiles.clj, add the fo
          src-dir (:root project)
          dest-dir (str "/src/" (:name project))
          lein-cmd (str "lein " (str/join " " lein-args))]
-     (sh-trampoline (str/join " " [(maybe-sudo project) "docker" "run" "-it" (port-map project) "-v" (str src-dir ":" dest-dir) (maybe-m2-map project) img (format "sh -c '%s'" (<< "cd ~{dest-dir}; ~{lein-cmd}"))])))))
+     (sh-trampoline (str/join " " [(maybe-sudo project) "docker" "run" "-it" (env-vars project) (port-map project) "-v" (str src-dir ":" dest-dir) (maybe-m2-map project) (links project) img (format "sh -c '%s'" (<< "cd ~{dest-dir}; ~{lein-cmd}"))])))))
 
 (defn docker
   "Run docker commands"

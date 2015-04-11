@@ -39,6 +39,8 @@ Performs a `docker run` on image, mounting this project's directory inside the c
 Optional Project config: In your project.clj or ~/.lein/profiles.clj, add the following to your :docker map
 - `:sudo true` if docker requires sudo to `docker run`
 - `:ports {}` a map, passed to -p for port mapping
+- `:env #{}` a set of environment variables that if present in the parent env, will be passed through to the child lein process
+- `:links {}` a map, passed to --links
 - `:m2-dest "/home/username/.m2/"`, will `-v` mount ~/.m2/ to :m2-dest, dramatically speeds up lein deps
   
 ## License
