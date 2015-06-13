@@ -5,4 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[me.raynes/conch "0.8.0"]
                  [org.clojure/core.incubator "0.1.3"]]
-  :eval-in-leiningen true)
+  :eval-in-leiningen true
+  :deploy-repositories [["releases" {:url "https://clojars.org/repo"
+                                     :creds :gpg}]])
