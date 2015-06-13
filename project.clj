@@ -1,4 +1,4 @@
-(defproject arohner/lein-docker "0.1.4"
+(defproject arohner/lein-docker "0.1.5-SNAPSHOT"
   :description "Tools for building and pushing docker containers"
   :url "https://github.com/arohner/lein-docker"
   :license {:name "Eclipse Public License"
