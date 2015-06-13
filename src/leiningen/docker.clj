@@ -26,13 +26,20 @@
     (future (shll/stream-to-out p :err))
     (shll/exit-code p)))
 
-(defn build* 
+(defn sh!
+  "Same as sh, throw on error"
+  [& args]
+  (let [resp (apply sh args)]
+    (if (not= 0 resp)
+      (throw (Exception. (str args "returned" resp))))))
+
+(defn build*
   [repo version]
   (assert repo "repo is required")
   (assert version "version is required")
   (let [tag (str repo ":" version)]
     (println "building" tag)
-    (sh "docker" "build" "-t" tag ".")))
+    (sh! "docker" "build" "-t" tag ".")))
 
 (defn build
   ([project args]
@@ -66,7 +73,7 @@
   (assert version "version is required")
   (let [tag (str repo ":" version)]
     (println "pushing" tag)
-    (sh "docker" "push" tag)))
+    (sh! "docker" "push" tag)))
 
 (defn project-repo [project]
   (-> project :docker :repo))
